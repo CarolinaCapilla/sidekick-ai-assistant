@@ -48,6 +48,9 @@ ENV/
 # Sandbox directory (for file operations)
 sandbox/
 
+# Output files
+outputs/
+
 # Log files
 *.log
 logs/

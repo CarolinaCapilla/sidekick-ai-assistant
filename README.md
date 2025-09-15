@@ -9,6 +9,7 @@ An intelligent AI assistant that helps you complete tasks through a conversation
 - **Web Interface**: Clean Gradio UI for easy interaction
 - **Web Browsing Capabilities**: Built-in browser automation with Playwright
 - **Push Notifications**: Optional push notifications via Pushover
+- **Automatic Output Saving**: Conversation outputs automatically saved as markdown files
 - **Modular Design**: Easy to extend with additional tools
 
 ## 🏗️ Architecture
@@ -108,11 +109,13 @@ sidekick_app/
 │   │   ├── search_tools.py     # Search and Wikipedia tools
 │   │   └── python_tools.py     # Python REPL tools
 │   └── utils/                  # Utility functions
-│       └── __init__.py         # Common helper functions
+│       ├── __init__.py         # Common helper functions
+│       └── output_saver.py     # Conversation output saving utilities
 ├── ui/                         # UI components
 │   ├── __init__.py
 │   └── app.py                  # Gradio UI
 ├── sandbox/                    # Directory for file operations
+├── outputs/                    # Saved conversation outputs
 └── README.md                   # This file
 ```
 
@@ -152,6 +155,21 @@ The SQLite database file for persistent memory can be configured in `config/sett
 ```python
 SQLITE_DB_FILE = os.getenv("SQLITE_DB_FILE", "sidekick_memory.sqlite")
 ```
+
+### Output Saving
+
+Conversation outputs are automatically saved as markdown files in the `outputs/` directory. Each file includes:
+
+- Timestamp and request information in the filename
+- Original request and success criteria
+- Complete conversation history
+- Final output in a dedicated section
+
+The saved files can be used for:
+- Documentation of completed tasks
+- Sharing results with team members
+- Reviewing past interactions
+- Building a knowledge base of solutions
 
 ## 🤝 Contributing
 

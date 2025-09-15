@@ -1,5 +1,7 @@
 import gradio as gr
+import os
 from sidekick import Sidekick
+from sidekick.utils.output_saver import save_conversation_to_markdown
 
 
 async def setup():
@@ -15,6 +17,20 @@ async def process_message(sidekick, message, success_criteria, history):
         await sidekick.setup()
     
     results = await sidekick.run_superstep(message, success_criteria, history)
+    
+    # Save the conversation to a markdown file
+    output_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "outputs")
+    saved_file = save_conversation_to_markdown(message, success_criteria, results, output_dir)
+    
+    # Add a notification about the saved file
+    if saved_file:
+        # Create a notification message
+        notification = {
+            "role": "system", 
+            "content": f"📝 Conversation saved to: {os.path.basename(saved_file)}"
+        }
+        results.append(notification)
+    
     return results, sidekick
 
 
