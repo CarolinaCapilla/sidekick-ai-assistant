@@ -5,7 +5,7 @@ from langgraph.graph.message import add_messages
 from dotenv import load_dotenv
 from langgraph.prebuilt import ToolNode
 from langchain_openai import ChatOpenAI
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.sqlite import SqliteSaver
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from typing import List, Any, Optional, Dict
 from pydantic import BaseModel, Field
@@ -41,7 +41,7 @@ class Sidekick:
         self.llm_with_tools = None
         self.graph = None
         self.sidekick_id = str(uuid.uuid4())
-        self.memory = MemorySaver()
+        self.memory = SqliteSaver(db_file="sidekick_memory.sqlite")
         self.browser = None
         self.playwright = None
 
