@@ -1,6 +1,6 @@
 # Sidekick Personal Co-Worker
 
-An intelligent AI assistant that helps you complete tasks through a conversational interface. Built with LangGraph and Gradio for an intuitive web experience.
+An intelligent AI assistant that helps you complete tasks through a conversational interface. Built with LangGraph and currently using Gradio for the web interface, with plans to migrate to a more robust Flask + Vue.js architecture.
 
 ## 🚀 Features
 
@@ -134,9 +134,30 @@ logging.basicConfig(level=logging.DEBUG)
 
 ## 🔄 Future Enhancements
 
+### Flask + Vue UI Migration
+
+- [ ] **Backend API Development**
+  - [ ] Create Flask API endpoints for Sidekick functionality
+  - [ ] Implement WebSocket support for real-time updates
+  - [ ] Design RESTful API for conversation management
+  - [ ] Add authentication middleware and user sessions
+
+- [ ] **Vue.js Frontend**
+  - [ ] Set up Vue 3 project with Composition API
+  - [ ] Create responsive chat interface components
+  - [ ] Implement Vuex store for state management
+  - [ ] Design modern UI with Tailwind CSS or Vuetify
+
+- [ ] **DevOps & Deployment**
+  - [ ] Configure Docker containers for Flask and Vue
+  - [ ] Set up CI/CD pipeline for automated testing and deployment
+  - [ ] Implement environment-specific configurations
+
+### Other Enhancements
+
 - [ ] Add support for additional LLM providers
 - [ ] Implement conversation history persistence
-- [ ] Add user authentication
+- [ ] Add user authentication and multi-user support
 - [ ] Create mobile app interface
 - [ ] Implement task scheduling
 - [ ] Add voice input/output capabilities
@@ -151,4 +172,4 @@ If you encounter any issues or have questions:
 
 ---
 
-**Made with ❤️ using LangGraph and Gradio**
+**Made with ❤️ using LangGraph and Gradio** (Future: Flask + Vue.js)
