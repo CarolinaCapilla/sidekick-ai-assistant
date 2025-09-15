@@ -52,6 +52,11 @@ sandbox/
 *.log
 logs/
 
+# SQLite database files
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
 # Cache directories
 .cache/
 .pytest_cache/
