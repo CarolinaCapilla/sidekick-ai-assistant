@@ -9,6 +9,11 @@ async def setup():
 
 
 async def process_message(sidekick, message, success_criteria, history):
+    # Initialize sidekick if it's None
+    if sidekick is None:
+        sidekick = Sidekick()
+        await sidekick.setup()
+    
     results = await sidekick.run_superstep(message, success_criteria, history)
     return results, sidekick
 
@@ -45,6 +50,7 @@ with gr.Blocks(title="Sidekick", theme=gr.themes.Default(primary_hue="emerald"))
         reset_button = gr.Button("Reset", variant="stop")
         go_button = gr.Button("Go!", variant="primary")
 
+    # Make sure to initialize the sidekick when the UI loads
     ui.load(setup, [], [sidekick])
     message.submit(
         process_message, [sidekick, message, success_criteria, chatbot], [chatbot, sidekick]
@@ -56,6 +62,3 @@ with gr.Blocks(title="Sidekick", theme=gr.themes.Default(primary_hue="emerald"))
         process_message, [sidekick, message, success_criteria, chatbot], [chatbot, sidekick]
     )
     reset_button.click(reset, [], [message, success_criteria, chatbot, sidekick])
-
-
-ui.launch(inbrowser=True)

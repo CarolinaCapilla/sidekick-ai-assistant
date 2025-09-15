@@ -1,4 +1,5 @@
-from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+import aiosqlite
 from langchain_openai import ChatOpenAI
 from sidekick.core.state import State
 from langgraph.graph import StateGraph, START, END
@@ -8,9 +9,14 @@ from typing import Dict, Any
 import asyncio
 from datetime import datetime
 import uuid
+import logging
 from sidekick.tools import get_all_tools
 from sidekick.core.evaluator import Evaluator
 from config.settings import DEFAULT_MODEL, SQLITE_DB_FILE
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class Sidekick:
     def __init__(self):
@@ -18,7 +24,8 @@ class Sidekick:
         self.tools = None
         self.graph = None
         self.sidekick_id = str(uuid.uuid4())
-        self.memory = SqliteSaver(db_file=SQLITE_DB_FILE)
+        # Will be initialized in setup()
+        self.memory = None
         self.browser = None
         self.playwright = None
         self.evaluator = Evaluator()
@@ -27,6 +34,11 @@ class Sidekick:
         self.tools, self.browser, self.playwright = await get_all_tools()
         worker_llm = ChatOpenAI(model=DEFAULT_MODEL)
         self.worker_llm_with_tools = worker_llm.bind_tools(self.tools)
+        
+        # Initialize the SQLite saver
+        conn = await aiosqlite.connect(SQLITE_DB_FILE)
+        self.memory = AsyncSqliteSaver(conn)
+        
         await self.build_graph()
     
     def worker(self, state: State) -> Dict[str, Any]:
@@ -77,8 +89,10 @@ class Sidekick:
         last_message = state["messages"][-1]
 
         if hasattr(last_message, "tool_calls") and last_message.tool_calls:
+            logger.info("Routing to tools")
             return "tools"
         else:
+            logger.info("Routing to evaluator")
             return "evaluator"
 
 
@@ -105,7 +119,10 @@ class Sidekick:
         self.graph = graph_builder.compile(checkpointer=self.memory)
 
     async def run_superstep(self, message, success_criteria, history):
-        config = {"configurable": {"thread_id": self.sidekick_id}}
+        config = {
+            "configurable": {"thread_id": self.sidekick_id},
+            "recursion_limit": 50  # Increase recursion limit to avoid errors
+        }
 
         state = {
             "messages": message,

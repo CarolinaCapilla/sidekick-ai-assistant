@@ -1,8 +1,12 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from typing import List, Any, Dict
+import logging
 from sidekick.core.state import EvaluatorOutput, State
 from config.settings import DEFAULT_MODEL
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 class Evaluator:
     """
@@ -103,7 +107,12 @@ class Evaluator:
         Returns:
             str: The next node to route to ("worker" or "END").
         """
-        if state["success_criteria_met"] or state["user_input_needed"]:
+        if state["success_criteria_met"]:
+            logger.info("Success criteria met, ending graph execution")
+            return "END"
+        elif state["user_input_needed"]:
+            logger.info("User input needed, ending graph execution")
             return "END"
         else:
+            logger.info("Success criteria not met, continuing with worker")
             return "worker"
