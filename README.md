@@ -137,7 +137,6 @@ logging.basicConfig(level=logging.DEBUG)
 - [ ] Add support for additional LLM providers
 - [ ] Implement conversation history persistence
 - [ ] Add user authentication
-- [ ] Create mobile app interface
 - [ ] Implement task scheduling
 - [ ] Add voice input/output capabilities
 
