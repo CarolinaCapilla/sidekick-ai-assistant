@@ -13,11 +13,23 @@ An intelligent AI assistant that helps you complete tasks through a conversation
 
 ## 🏗️ Architecture
 
-The system consists of several specialized components:
+The system consists of several specialized components organized in a modular structure:
 
-- **Worker Agent**: Performs tasks and uses tools to complete user requests
-- **Evaluator Agent**: Assesses if the success criteria have been met
-- **Tool System**: Includes web browsing, file management, search, and more
+- **Core Components**:
+  - **Worker Agent**: Performs tasks and uses tools to complete user requests
+  - **Evaluator**: Assesses if the success criteria have been met
+  - **State Management**: Handles the conversation state and evaluation outputs
+
+- **Tools System**:
+  - **Browser Tools**: Web browsing capabilities via Playwright
+  - **Search Tools**: Web search and Wikipedia access
+  - **File Tools**: File system operations
+  - **Notification Tools**: Push notifications via Pushover
+  - **Python Tools**: Code execution via REPL
+
+- **Memory Management**:
+  - **SQLite Storage**: Persistent conversation memory
+
 - **LangGraph Workflow**: Orchestrates the entire task completion pipeline
 
 ## 📋 Prerequisites
@@ -54,7 +66,7 @@ The system consists of several specialized components:
 ### Running the Web App
 
 ```bash
-python app.py
+python main.py
 ```
 
 This will launch a Gradio web interface where you can:
@@ -74,32 +86,71 @@ This will launch a Gradio web interface where you can:
 
 ```
 sidekick_app/
-├── app.py              # Main Gradio web application
-├── sidekick.py         # Core Sidekick implementation with LangGraph
-├── sidekick_tools.py   # Tools implementation (browser, search, etc.)
-├── sandbox/            # Directory for file operations
-└── README.md           # This file
+├── main.py                     # Main entry point
+├── config/                     # Configuration management
+│   ├── __init__.py
+│   └── settings.py             # App settings and environment variables
+├── sidekick/                   # Core package
+│   ├── __init__.py             # Package exports
+│   ├── core/                   # Core functionality
+│   │   ├── __init__.py
+│   │   ├── agent.py            # Main sidekick agent
+│   │   ├── evaluator.py        # Evaluation logic
+│   │   └── state.py            # State management classes
+│   ├── memory/                 # Memory and persistence
+│   │   ├── __init__.py
+│   │   └── sqlite_store.py     # SQLite implementation
+│   ├── tools/                  # All tools
+│   │   ├── __init__.py         # Combined tools export
+│   │   ├── browser.py          # Playwright tools
+│   │   ├── notifications.py    # Push notification tools
+│   │   ├── file_tools.py       # File management tools
+│   │   ├── search_tools.py     # Search and Wikipedia tools
+│   │   └── python_tools.py     # Python REPL tools
+│   └── utils/                  # Utility functions
+│       └── __init__.py         # Common helper functions
+├── ui/                         # UI components
+│   ├── __init__.py
+│   └── app.py                  # Gradio UI
+├── sandbox/                    # Directory for file operations
+└── README.md                   # This file
 ```
 
 ## 🔧 Configuration
 
 ### Agent Configuration
 
-The Sidekick uses GPT-4o-mini by default, but you can modify the model in `sidekick.py`:
+The Sidekick uses GPT-4o-mini by default, but you can modify the model in `config/settings.py`:
 
 ```python
-worker_llm = ChatOpenAI(model="gpt-4o-mini")  # Change to your preferred model
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "gpt-4o-mini")
 ```
 
 ### Tool Configuration
 
-Additional tools can be added in `sidekick_tools.py`:
+Additional tools can be added by creating new modules in the `sidekick/tools/` directory and updating the `get_all_tools()` function in `sidekick/tools/__init__.py`:
 
 ```python
-async def other_tools():
-    # Add your custom tools here
-    custom_tool = Tool(name="tool_name", func=tool_function, description="Tool description")
-    return existing_tools + [custom_tool]
+# In your new tool file (e.g., sidekick/tools/custom_tools.py)
+def get_custom_tool():
+    return Tool(name="tool_name", func=tool_function, description="Tool description")
+
+# Then update sidekick/tools/__init__.py to include your new tool
+from sidekick.tools.custom_tools import get_custom_tool
+
+async def get_all_tools():
+    # ... existing code ...
+    custom_tool = get_custom_tool()
+    all_tools = existing_tools + [custom_tool]
+    return all_tools, browser, playwright
+```
+
+### Memory Configuration
+
+The SQLite database file for persistent memory can be configured in `config/settings.py`:
+
+```python
+SQLITE_DB_FILE = os.getenv("SQLITE_DB_FILE", "sidekick_memory.sqlite")
 ```
 
 ## 🤝 Contributing
