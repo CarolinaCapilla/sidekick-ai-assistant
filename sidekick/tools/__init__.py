@@ -3,6 +3,7 @@ from sidekick.tools.file_tools import get_file_tools
 from sidekick.tools.notifications import get_notification_tool
 from sidekick.tools.search_tools import get_search_tools
 from sidekick.tools.python_tools import get_python_repl_tool
+from sidekick.tools.output_tools import get_output_saver_tool
 
 async def get_all_tools():
     """
@@ -22,6 +23,13 @@ async def get_all_tools():
     python_repl = get_python_repl_tool()
     
     # Combine all tools
-    all_tools = browser_tools + file_tools + [notification_tool] + search_tools + [python_repl]
+    all_tools = (
+        browser_tools
+        + file_tools
+        + [notification_tool]
+        + search_tools
+        + [python_repl]
+        + [get_output_saver_tool()]
+    )
     
     return all_tools, browser, playwright
